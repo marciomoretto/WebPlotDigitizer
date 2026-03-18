@@ -22,6 +22,38 @@ RSpec.describe "Minimal digitizer embedded in Rails", type: :system, js: true do
     expect(page).to have_css("[data-wpd-points-count]", text: "2")
   end
 
+
+  it "switches mode and zoom through keyboard shortcuts when the canvas panel is focused" do
+    visit rails_host_minimal_digitizer_path
+
+    page.execute_script <<~JS
+      (function() {
+        var root = document.querySelector('[data-wpd-app]');
+        var app = root.__wpdMinimalApp || wpd.mountMinimalApp(root);
+        app.elements.hotkeysScope.focus();
+        window.__wpdModeAndZoom = function() {
+          return {
+            mode: app.mode,
+            scale: app.scale,
+            pointsCount: root.querySelector('[data-wpd-points-count]').textContent
+          };
+        };
+      })();
+    JS
+
+    find('[data-wpd-hotkeys-scope]').send_keys('d')
+    expect(page.evaluate_script('window.__wpdModeAndZoom().mode')).to eq('delete')
+
+    find('[data-wpd-hotkeys-scope]').send_keys('a')
+    expect(page.evaluate_script('window.__wpdModeAndZoom().mode')).to eq('add')
+
+    find('[data-wpd-hotkeys-scope]').send_keys('=')
+    expect(page.evaluate_script('window.__wpdModeAndZoom().scale')).to be > 1
+
+    find('[data-wpd-hotkeys-scope]').send_keys('-')
+    expect(page.evaluate_script('window.__wpdModeAndZoom().scale')).to eq(1)
+  end
+
   it "bubbles the submit payload so the Rails page can consume it" do
     visit rails_host_minimal_digitizer_path
 

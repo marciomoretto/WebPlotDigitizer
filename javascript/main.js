@@ -61,6 +61,7 @@ wpd.MinimalApp.prototype.cacheElements = function() {
     this.elements.deletePointBtn = this.query('[data-wpd-delete-point]');
     this.elements.submitBtn = this.query('[data-wpd-submit]');
     this.elements.pointsCountValue = this.query('[data-wpd-points-count]');
+    this.elements.hotkeysScope = this.query('[data-wpd-hotkeys-scope]');
     this.elements.cursorReadout = this.query('[data-wpd-cursor-readout]');
     this.elements.zoomLevelLabel = this.query('[data-wpd-zoom-level]');
 };
@@ -72,6 +73,7 @@ wpd.MinimalApp.prototype.bindEvents = function() {
     this.elements.addPointBtn.addEventListener('click', this.setMode.bind(this, 'add'));
     this.elements.deletePointBtn.addEventListener('click', this.setMode.bind(this, 'delete'));
     this.elements.submitBtn.addEventListener('click', this.submit.bind(this));
+    this.elements.hotkeysScope.addEventListener('keydown', this.handleHotkeys.bind(this));
     this.elements.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
     this.elements.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
     this.elements.canvas.addEventListener('mouseleave', this.handlePointerLeave.bind(this));
@@ -152,9 +154,39 @@ wpd.MinimalApp.prototype.handleCanvasClick = function(event) {
         this.deleteNearestPoint(imagePoint);
     }
 
+    this.elements.hotkeysScope.focus();
     this.hoverImagePoint = imagePoint;
     this.render();
     this.updatePointsCount();
+};
+
+wpd.MinimalApp.prototype.handleHotkeys = function(event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+    }
+
+    if (event.key === 'a' || event.key === 'A') {
+        this.setMode('add');
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === 'd' || event.key === 'D') {
+        this.setMode('delete');
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === '+' || event.key === '=') {
+        this.zoomIn();
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === '-' || event.key === '_') {
+        this.zoomOut();
+        event.preventDefault();
+    }
 };
 
 wpd.MinimalApp.prototype.handlePointerMove = function(event) {

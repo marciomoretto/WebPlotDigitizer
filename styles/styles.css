@@ -488,6 +488,11 @@ label {
     padding: 16px;
 }
 
+.canvas-panel:focus {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
 .wpd-image-canvas {
     display: block;
     max-width: none;
