@@ -77,6 +77,11 @@
                 <span class="axis-pill">{{ _('Image') }}</span>
             </div>
 
+            <div class="control-group points-count-group">
+                <span class="control-label">{{ _('Points') }}</span>
+                <span class="points-count-pill"><span id="pointsCountValue">0</span> {{ _('marked') }}</span>
+            </div>
+
             <div class="control-group submit-group">
                 <button type="button" id="submitBtn" class="submit-button">{{ _('Submit') }}</button>
             </div>
@@ -95,7 +100,7 @@
                 </div>
             </div>
 
-            <aside class="sidebar-card">
+            <aside class="sidebar-card" hidden aria-hidden="true">
                 <div>
                     <p class="sidebar-title-text">{{ _('Axis') }}</p>
                     <p id="axisInfo">{{ _('Fixed to image coordinates') }}</p>

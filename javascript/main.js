@@ -50,6 +50,7 @@ wpd.app = {
         this.elements.addPointBtn = document.getElementById('addPointBtn');
         this.elements.deletePointBtn = document.getElementById('deletePointBtn');
         this.elements.submitBtn = document.getElementById('submitBtn');
+        this.elements.pointsCountValue = document.getElementById('pointsCountValue');
         this.elements.pointsList = document.getElementById('pointsList');
         this.elements.submitOutput = document.getElementById('submitOutput');
         this.elements.cursorReadout = document.getElementById('cursorReadout');
@@ -107,6 +108,7 @@ wpd.app = {
             };
             app.render();
             app.renderPointsList();
+            app.updatePointsCount();
             app.updateSubmitOutput('');
         };
         image.src = url;
@@ -144,6 +146,7 @@ wpd.app = {
         this.hoverImagePoint = imagePoint;
         this.render();
         this.renderPointsList();
+        this.updatePointsCount();
     },
 
     handlePointerMove: function(event) {
@@ -297,6 +300,10 @@ wpd.app = {
             item.textContent = '#' + (index + 1) + ' — x: ' + point.x.toFixed(1) + ', y: ' + point.y.toFixed(1);
             list.appendChild(item);
         }
+    },
+
+    updatePointsCount: function() {
+        this.elements.pointsCountValue.textContent = String(this.points.length);
     },
 
     updateSubmitOutput: function(value) {

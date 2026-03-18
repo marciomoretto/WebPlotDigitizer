@@ -439,8 +439,23 @@ label {
     font-weight: 700;
 }
 
-.submit-group {
+.points-count-group {
     margin-left: auto;
+}
+
+.points-count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 700;
+}
+
+.submit-group {
+    margin-left: 0;
 }
 
 .submit-button {
@@ -457,8 +472,7 @@ label {
 }
 
 .workspace-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    display: block;
     gap: 16px;
     padding: 16px;
     min-height: 0;
@@ -523,10 +537,7 @@ label {
 }
 
 .sidebar-card {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
+    display: none;
 }
 
 .points-list {
@@ -567,16 +578,12 @@ label {
         padding: 16px;
     }
 
-    .workspace-card {
-        grid-template-columns: 1fr;
-    }
-
     .zoom-panel {
         position: static;
         margin-top: 16px;
     }
 
-    .submit-group {
+    .points-count-group {
         margin-left: 0;
     }
 }
