@@ -315,3 +315,246 @@ select>option {
 label {
     vertical-align: top;
 }
+
+.wpd-loading-curtain {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.96);
+    color: #111827;
+    font-size: 18px;
+}
+
+.minimal-app {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #f3f4f6;
+}
+
+.app-header,
+.toolbar-card,
+.workspace-card {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.app-header {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.eyebrow {
+    margin: 0 0 4px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.subtle {
+    margin: 6px 0 0;
+    color: #4b5563;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #111827;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.file-button:hover {
+    background: #1f2937;
+}
+
+[data-wpd-image-loader] {
+    display: none;
+}
+
+.toolbar-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.axis-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+.points-count-group {
+    margin-left: auto;
+}
+
+.points-count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 700;
+}
+
+.submit-group {
+    margin-left: 0;
+}
+
+.submit-button {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    font-weight: 700;
+    min-width: 100px;
+}
+
+.submit-button:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.workspace-card {
+    display: block;
+    gap: 16px;
+    padding: 16px;
+    min-height: 0;
+    flex: 1;
+}
+
+.canvas-panel {
+    position: relative;
+    overflow: auto;
+    min-height: 65vh;
+    border-radius: 12px;
+    background: #e5e7eb;
+    border: 1px solid #d1d5db;
+    padding: 16px;
+}
+
+.canvas-panel:focus {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.wpd-image-canvas {
+    display: block;
+    max-width: none;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+    cursor: crosshair;
+}
+
+.wpd-image-canvas.delete-mode {
+    cursor: not-allowed;
+}
+
+.zoom-panel {
+    position: sticky;
+    top: 16px;
+    margin-left: auto;
+    width: 220px;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #d1d5db;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.zoom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.wpd-zoom-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+
+.wpd-cursor-readout {
+    margin: 8px 0 0;
+    color: #4b5563;
+}
+
+
+@media (max-width: 960px) {
+    body {
+        overflow: auto;
+    }
+
+    .minimal-app {
+        padding: 16px;
+    }
+
+    .zoom-panel {
+        position: static;
+        margin-top: 16px;
+    }
+
+    .points-count-group {
+        margin-left: 0;
+    }
+}

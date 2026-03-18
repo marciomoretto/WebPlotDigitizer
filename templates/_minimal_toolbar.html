@@ -1,0 +1,27 @@
+<section class="toolbar-card">
+    <div class="control-group">
+        <span class="control-label">{{ _('Zoom') }}</span>
+        <button type="button" data-wpd-zoom-out>{{ _('Zoom out') }}</button>
+        <button type="button" data-wpd-zoom-in>{{ _('Zoom in') }}</button>
+    </div>
+
+    <div class="control-group">
+        <span class="control-label">{{ _('Mode') }}</span>
+        <button type="button" data-wpd-add-point class="pressed-button">{{ _('Add point') }}</button>
+        <button type="button" data-wpd-delete-point>{{ _('Delete point') }}</button>
+    </div>
+
+    <div class="control-group axis-group">
+        <span class="control-label">{{ _('Axis') }}</span>
+        <span class="axis-pill">{{ _('Image') }}</span>
+    </div>
+
+    <div class="control-group points-count-group">
+        <span class="control-label">{{ _('Points') }}</span>
+        <span data-wpd-points-count class="points-count-pill">0</span>
+    </div>
+
+    <div class="control-group submit-group">
+        <button type="button" data-wpd-submit class="submit-button">{{ _('Submit') }}</button>
+    </div>
+</section>
