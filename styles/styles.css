@@ -316,8 +316,8 @@ label {
     vertical-align: top;
 }
 
-#loadingCurtain {
-    position: fixed;
+.wpd-loading-curtain {
+    position: absolute;
     inset: 0;
     z-index: 100;
     display: flex;
@@ -328,7 +328,8 @@ label {
     font-size: 18px;
 }
 
-#minimalApp {
+.minimal-app {
+    position: relative;
     box-sizing: border-box;
     min-height: 100%;
     padding: 24px;
@@ -340,8 +341,7 @@ label {
 
 .app-header,
 .toolbar-card,
-.workspace-card,
-.sidebar-card {
+.workspace-card {
     background: #ffffff;
     border: 1px solid #d1d5db;
     border-radius: 16px;
@@ -399,7 +399,7 @@ label {
     background: #1f2937;
 }
 
-#imageLoader {
+[data-wpd-image-loader] {
     display: none;
 }
 
@@ -419,8 +419,7 @@ label {
     flex-wrap: wrap;
 }
 
-.control-label,
-.sidebar-title-text {
+.control-label {
     margin: 0;
     font-size: 12px;
     font-weight: 700;
@@ -489,7 +488,7 @@ label {
     padding: 16px;
 }
 
-#imageCanvas {
+.wpd-image-canvas {
     display: block;
     max-width: none;
     background: #ffffff;
@@ -497,7 +496,7 @@ label {
     cursor: crosshair;
 }
 
-#imageCanvas.delete-mode {
+.wpd-image-canvas.delete-mode {
     cursor: not-allowed;
 }
 
@@ -521,7 +520,7 @@ label {
     font-weight: 700;
 }
 
-#zoomCanvas {
+.wpd-zoom-canvas {
     width: 100%;
     height: auto;
     display: block;
@@ -530,51 +529,18 @@ label {
     background: #f9fafb;
 }
 
-#cursorReadout,
-#axisInfo {
+.wpd-cursor-readout {
     margin: 8px 0 0;
     color: #4b5563;
 }
 
-.sidebar-card {
-    display: none;
-}
-
-.points-list {
-    margin: 8px 0 0;
-    padding-left: 20px;
-    max-height: 240px;
-    overflow: auto;
-}
-
-.points-list li {
-    margin-bottom: 6px;
-}
-
-.empty-state {
-    color: #6b7280;
-}
-
-#submitOutput {
-    width: 100%;
-    min-height: 220px;
-    box-sizing: border-box;
-    margin-top: 8px;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    font-family: monospace;
-    font-size: 12px;
-    line-height: 1.5;
-}
 
 @media (max-width: 960px) {
     body {
         overflow: auto;
     }
 
-    #minimalApp {
+    .minimal-app {
         padding: 16px;
     }
 

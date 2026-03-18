@@ -19,316 +19,324 @@
 
 var wpd = window.wpd || {};
 
-wpd.app = {
-    scale: 1,
-    minScale: 0.25,
-    maxScale: 6,
-    zoomStep: 1.25,
-    mode: 'add',
-    markerRadius: 5,
-    points: [],
-    hoverImagePoint: null,
-    image: null,
-    objectUrl: null,
-    elements: {},
+wpd.MinimalApp = function(rootElement) {
+    this.root = rootElement;
+    this.scale = 1;
+    this.minScale = 0.25;
+    this.maxScale = 6;
+    this.zoomStep = 1.25;
+    this.mode = 'add';
+    this.markerRadius = 5;
+    this.points = [];
+    this.hoverImagePoint = null;
+    this.image = null;
+    this.objectUrl = null;
+    this.lastSubmittedPayload = null;
+    this.elements = {};
+};
 
-    init: function() {
-        this.cacheElements();
-        this.bindEvents();
-        this.loadDefaultImage();
-        this.hideLoadingCurtain();
-    },
+wpd.MinimalApp.prototype.init = function() {
+    this.cacheElements();
+    this.bindEvents();
+    this.updatePointsCount();
+    this.loadDefaultImage();
+    this.hideLoadingCurtain();
+    this.root.dataset.wpdMounted = 'true';
+};
 
-    cacheElements: function() {
-        this.elements.canvas = document.getElementById('imageCanvas');
-        this.elements.ctx = this.elements.canvas.getContext('2d');
-        this.elements.zoomCanvas = document.getElementById('zoomCanvas');
-        this.elements.zoomCtx = this.elements.zoomCanvas.getContext('2d');
-        this.elements.imageLoader = document.getElementById('imageLoader');
-        this.elements.zoomInBtn = document.getElementById('zoomInBtn');
-        this.elements.zoomOutBtn = document.getElementById('zoomOutBtn');
-        this.elements.addPointBtn = document.getElementById('addPointBtn');
-        this.elements.deletePointBtn = document.getElementById('deletePointBtn');
-        this.elements.submitBtn = document.getElementById('submitBtn');
-        this.elements.pointsCountValue = document.getElementById('pointsCountValue');
-        this.elements.pointsList = document.getElementById('pointsList');
-        this.elements.submitOutput = document.getElementById('submitOutput');
-        this.elements.cursorReadout = document.getElementById('cursorReadout');
-        this.elements.zoomLevelLabel = document.getElementById('zoomLevelLabel');
-    },
+wpd.MinimalApp.prototype.query = function(selector) {
+    return this.root.querySelector(selector);
+};
 
-    bindEvents: function() {
-        this.elements.imageLoader.addEventListener('change', this.handleImageUpload.bind(this));
-        this.elements.zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
-        this.elements.zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
-        this.elements.addPointBtn.addEventListener('click', this.setMode.bind(this, 'add'));
-        this.elements.deletePointBtn.addEventListener('click', this.setMode.bind(this, 'delete'));
-        this.elements.submitBtn.addEventListener('click', this.submit.bind(this));
-        this.elements.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
-        this.elements.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
-        this.elements.canvas.addEventListener('mouseleave', this.handlePointerLeave.bind(this));
-        window.addEventListener('resize', this.render.bind(this));
-    },
+wpd.MinimalApp.prototype.cacheElements = function() {
+    this.elements.loadingCurtain = this.query('[data-wpd-loading-curtain]');
+    this.elements.canvas = this.query('[data-wpd-image-canvas]');
+    this.elements.ctx = this.elements.canvas.getContext('2d');
+    this.elements.zoomCanvas = this.query('[data-wpd-zoom-canvas]');
+    this.elements.zoomCtx = this.elements.zoomCanvas.getContext('2d');
+    this.elements.imageLoader = this.query('[data-wpd-image-loader]');
+    this.elements.zoomInBtn = this.query('[data-wpd-zoom-in]');
+    this.elements.zoomOutBtn = this.query('[data-wpd-zoom-out]');
+    this.elements.addPointBtn = this.query('[data-wpd-add-point]');
+    this.elements.deletePointBtn = this.query('[data-wpd-delete-point]');
+    this.elements.submitBtn = this.query('[data-wpd-submit]');
+    this.elements.pointsCountValue = this.query('[data-wpd-points-count]');
+    this.elements.cursorReadout = this.query('[data-wpd-cursor-readout]');
+    this.elements.zoomLevelLabel = this.query('[data-wpd-zoom-level]');
+};
 
-    hideLoadingCurtain: function() {
-        var loadingCurtain = document.getElementById('loadingCurtain');
-        if (loadingCurtain != null) {
-            loadingCurtain.style.display = 'none';
-        }
-    },
+wpd.MinimalApp.prototype.bindEvents = function() {
+    this.elements.imageLoader.addEventListener('change', this.handleImageUpload.bind(this));
+    this.elements.zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
+    this.elements.zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
+    this.elements.addPointBtn.addEventListener('click', this.setMode.bind(this, 'add'));
+    this.elements.deletePointBtn.addEventListener('click', this.setMode.bind(this, 'delete'));
+    this.elements.submitBtn.addEventListener('click', this.submit.bind(this));
+    this.elements.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
+    this.elements.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
+    this.elements.canvas.addEventListener('mouseleave', this.handlePointerLeave.bind(this));
+    window.addEventListener('resize', this.render.bind(this));
+};
 
-    loadDefaultImage: function() {
-        this.loadImageFromUrl('start.png');
-    },
+wpd.MinimalApp.prototype.hideLoadingCurtain = function() {
+    if (this.elements.loadingCurtain != null) {
+        this.elements.loadingCurtain.style.display = 'none';
+    }
+};
 
-    handleImageUpload: function(event) {
-        var file = event.target.files != null ? event.target.files[0] : null;
-        if (file == null) {
-            return;
-        }
+wpd.MinimalApp.prototype.getDefaultImageUrl = function() {
+    return this.root.dataset.wpdDefaultImage || 'start.png';
+};
 
-        if (this.objectUrl != null) {
-            URL.revokeObjectURL(this.objectUrl);
-        }
+wpd.MinimalApp.prototype.loadDefaultImage = function() {
+    this.loadImageFromUrl(this.getDefaultImageUrl());
+};
 
-        this.objectUrl = URL.createObjectURL(file);
-        this.loadImageFromUrl(this.objectUrl);
-    },
+wpd.MinimalApp.prototype.handleImageUpload = function(event) {
+    var file = event.target.files != null ? event.target.files[0] : null;
+    if (file == null) {
+        return;
+    }
 
-    loadImageFromUrl: function(url) {
-        var app = this;
-        var image = new Image();
-        image.onload = function() {
-            app.image = image;
-            app.points = [];
-            app.scale = 1;
-            app.hoverImagePoint = {
-                x: image.width / 2,
-                y: image.height / 2
-            };
-            app.render();
-            app.renderPointsList();
-            app.updatePointsCount();
-            app.updateSubmitOutput('');
+    if (this.objectUrl != null) {
+        URL.revokeObjectURL(this.objectUrl);
+    }
+
+    this.objectUrl = URL.createObjectURL(file);
+    this.loadImageFromUrl(this.objectUrl);
+};
+
+wpd.MinimalApp.prototype.loadImageFromUrl = function(url) {
+    var app = this;
+    var image = new Image();
+    image.onload = function() {
+        app.image = image;
+        app.points = [];
+        app.scale = 1;
+        app.hoverImagePoint = {
+            x: image.width / 2,
+            y: image.height / 2
         };
-        image.src = url;
-    },
+        app.render();
+        app.updatePointsCount();
+    };
+    image.src = url;
+};
 
-    setMode: function(mode) {
-        this.mode = mode;
-        this.elements.addPointBtn.classList.toggle('pressed-button', mode === 'add');
-        this.elements.deletePointBtn.classList.toggle('pressed-button', mode === 'delete');
-        this.elements.canvas.classList.toggle('delete-mode', mode === 'delete');
-    },
+wpd.MinimalApp.prototype.setMode = function(mode) {
+    this.mode = mode;
+    this.elements.addPointBtn.classList.toggle('pressed-button', mode === 'add');
+    this.elements.deletePointBtn.classList.toggle('pressed-button', mode === 'delete');
+    this.elements.canvas.classList.toggle('delete-mode', mode === 'delete');
+};
 
-    zoomIn: function() {
-        this.scale = Math.min(this.maxScale, this.scale * this.zoomStep);
-        this.render();
-    },
+wpd.MinimalApp.prototype.zoomIn = function() {
+    this.scale = Math.min(this.maxScale, this.scale * this.zoomStep);
+    this.render();
+};
 
-    zoomOut: function() {
-        this.scale = Math.max(this.minScale, this.scale / this.zoomStep);
-        this.render();
-    },
+wpd.MinimalApp.prototype.zoomOut = function() {
+    this.scale = Math.max(this.minScale, this.scale / this.zoomStep);
+    this.render();
+};
 
-    handleCanvasClick: function(event) {
-        var imagePoint = this.getImagePointFromEvent(event);
-        if (imagePoint == null) {
-            return;
+wpd.MinimalApp.prototype.handleCanvasClick = function(event) {
+    var imagePoint = this.getImagePointFromEvent(event);
+    if (imagePoint == null) {
+        return;
+    }
+
+    if (this.mode === 'add') {
+        this.points.push(imagePoint);
+    } else {
+        this.deleteNearestPoint(imagePoint);
+    }
+
+    this.hoverImagePoint = imagePoint;
+    this.render();
+    this.updatePointsCount();
+};
+
+wpd.MinimalApp.prototype.handlePointerMove = function(event) {
+    var imagePoint = this.getImagePointFromEvent(event);
+    if (imagePoint == null) {
+        this.handlePointerLeave();
+        return;
+    }
+
+    this.hoverImagePoint = imagePoint;
+    this.elements.cursorReadout.textContent = 'x: ' + imagePoint.x.toFixed(1) + ', y: ' + imagePoint.y.toFixed(1);
+    this.renderZoom();
+};
+
+wpd.MinimalApp.prototype.handlePointerLeave = function() {
+    this.hoverImagePoint = null;
+    this.elements.cursorReadout.textContent = 'x: -, y: -';
+    this.renderZoom();
+};
+
+wpd.MinimalApp.prototype.getImagePointFromEvent = function(event) {
+    if (this.image == null) {
+        return null;
+    }
+
+    var rect = this.elements.canvas.getBoundingClientRect();
+    var x = (event.clientX - rect.left) / this.scale;
+    var y = (event.clientY - rect.top) / this.scale;
+
+    if (x < 0 || y < 0 || x > this.image.width || y > this.image.height) {
+        return null;
+    }
+
+    return {
+        x: x,
+        y: y
+    };
+};
+
+wpd.MinimalApp.prototype.deleteNearestPoint = function(imagePoint) {
+    if (this.points.length === 0) {
+        return;
+    }
+
+    var threshold = 14 / this.scale;
+    var nearestIndex = -1;
+    var nearestDistance = Infinity;
+
+    for (var index = 0; index < this.points.length; index++) {
+        var point = this.points[index];
+        var dx = point.x - imagePoint.x;
+        var dy = point.y - imagePoint.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = index;
         }
+    }
 
-        if (this.mode === 'add') {
-            this.points.push(imagePoint);
-        } else {
-            this.deleteNearestPoint(imagePoint);
-        }
+    if (nearestIndex !== -1 && nearestDistance <= threshold) {
+        this.points.splice(nearestIndex, 1);
+    }
+};
 
-        this.hoverImagePoint = imagePoint;
-        this.render();
-        this.renderPointsList();
-        this.updatePointsCount();
-    },
+wpd.MinimalApp.prototype.render = function() {
+    if (this.image == null) {
+        return;
+    }
 
-    handlePointerMove: function(event) {
-        var imagePoint = this.getImagePointFromEvent(event);
-        if (imagePoint == null) {
-            this.handlePointerLeave();
-            return;
-        }
+    this.elements.canvas.width = Math.round(this.image.width * this.scale);
+    this.elements.canvas.height = Math.round(this.image.height * this.scale);
 
-        this.hoverImagePoint = imagePoint;
-        this.elements.cursorReadout.textContent = 'x: ' + imagePoint.x.toFixed(1) + ', y: ' + imagePoint.y.toFixed(1);
-        this.renderZoom();
-    },
+    var ctx = this.elements.ctx;
+    ctx.clearRect(0, 0, this.elements.canvas.width, this.elements.canvas.height);
+    ctx.drawImage(this.image, 0, 0, this.elements.canvas.width, this.elements.canvas.height);
 
-    handlePointerLeave: function() {
-        this.hoverImagePoint = null;
-        this.elements.cursorReadout.textContent = 'x: -, y: -';
-        this.renderZoom();
-    },
+    for (var index = 0; index < this.points.length; index++) {
+        var point = this.points[index];
+        this.drawPoint(ctx, point, index + 1);
+    }
 
-    getImagePointFromEvent: function(event) {
-        if (this.image == null) {
-            return null;
-        }
+    this.elements.zoomLevelLabel.textContent = Math.round(this.scale * 100) + '%';
+    this.renderZoom();
+};
 
-        var rect = this.elements.canvas.getBoundingClientRect();
-        var x = (event.clientX - rect.left) / this.scale;
-        var y = (event.clientY - rect.top) / this.scale;
+wpd.MinimalApp.prototype.drawPoint = function(ctx, point, label) {
+    var screenX = point.x * this.scale;
+    var screenY = point.y * this.scale;
+    var radius = this.markerRadius + Math.max(0, this.scale - 1.0);
 
-        if (x < 0 || y < 0 || x > this.image.width || y > this.image.height) {
-            return null;
-        }
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.arc(screenX, screenY, radius, 0, Math.PI * 2, false);
+    ctx.fill();
+    ctx.stroke();
 
-        return {
-            x: x,
-            y: y
-        };
-    },
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText(String(label), screenX + radius + 4, screenY - radius - 4);
+    ctx.restore();
+};
 
-    deleteNearestPoint: function(imagePoint) {
-        if (this.points.length === 0) {
-            return;
-        }
+wpd.MinimalApp.prototype.renderZoom = function() {
+    var ctx = this.elements.zoomCtx;
+    var zoomCanvas = this.elements.zoomCanvas;
+    ctx.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(0, 0, zoomCanvas.width, zoomCanvas.height);
 
-        var threshold = 14 / this.scale;
-        var nearestIndex = -1;
-        var nearestDistance = Infinity;
+    if (this.image == null || this.hoverImagePoint == null) {
+        return;
+    }
 
-        for (var index = 0; index < this.points.length; index++) {
-            var point = this.points[index];
-            var dx = point.x - imagePoint.x;
-            var dy = point.y - imagePoint.y;
-            var distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestIndex = index;
-            }
-        }
+    var sourceSize = 40;
+    var sx = Math.max(0, Math.min(this.image.width - sourceSize, this.hoverImagePoint.x - sourceSize / 2));
+    var sy = Math.max(0, Math.min(this.image.height - sourceSize, this.hoverImagePoint.y - sourceSize / 2));
 
-        if (nearestIndex !== -1 && nearestDistance <= threshold) {
-            this.points.splice(nearestIndex, 1);
-        }
-    },
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(this.image, sx, sy, sourceSize, sourceSize, 0, 0, zoomCanvas.width, zoomCanvas.height);
 
-    render: function() {
-        if (this.image == null) {
-            return;
-        }
+    ctx.save();
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(zoomCanvas.width / 2, 0);
+    ctx.lineTo(zoomCanvas.width / 2, zoomCanvas.height);
+    ctx.moveTo(0, zoomCanvas.height / 2);
+    ctx.lineTo(zoomCanvas.width, zoomCanvas.height / 2);
+    ctx.stroke();
+    ctx.restore();
+};
 
-        this.elements.canvas.width = Math.round(this.image.width * this.scale);
-        this.elements.canvas.height = Math.round(this.image.height * this.scale);
-
-        var ctx = this.elements.ctx;
-        ctx.clearRect(0, 0, this.elements.canvas.width, this.elements.canvas.height);
-        ctx.drawImage(this.image, 0, 0, this.elements.canvas.width, this.elements.canvas.height);
-
-        for (var index = 0; index < this.points.length; index++) {
-            var point = this.points[index];
-            this.drawPoint(ctx, point, index + 1);
-        }
-
-        this.elements.zoomLevelLabel.textContent = Math.round(this.scale * 100) + '%';
-        this.renderZoom();
-    },
-
-    drawPoint: function(ctx, point, label) {
-        var screenX = point.x * this.scale;
-        var screenY = point.y * this.scale;
-        var radius = this.markerRadius + Math.max(0, this.scale - 1.0);
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.fillStyle = '#ef4444';
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.arc(screenX, screenY, radius, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#111827';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(String(label), screenX + radius + 4, screenY - radius - 4);
-        ctx.restore();
-    },
-
-    renderZoom: function() {
-        var ctx = this.elements.zoomCtx;
-        var zoomCanvas = this.elements.zoomCanvas;
-        ctx.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
-        ctx.fillStyle = '#f3f4f6';
-        ctx.fillRect(0, 0, zoomCanvas.width, zoomCanvas.height);
-
-        if (this.image == null || this.hoverImagePoint == null) {
-            return;
-        }
-
-        var sourceSize = 40;
-        var sx = Math.max(0, Math.min(this.image.width - sourceSize, this.hoverImagePoint.x - sourceSize / 2));
-        var sy = Math.max(0, Math.min(this.image.height - sourceSize, this.hoverImagePoint.y - sourceSize / 2));
-
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(this.image, sx, sy, sourceSize, sourceSize, 0, 0, zoomCanvas.width, zoomCanvas.height);
-
-        ctx.save();
-        ctx.strokeStyle = '#2563eb';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(zoomCanvas.width / 2, 0);
-        ctx.lineTo(zoomCanvas.width / 2, zoomCanvas.height);
-        ctx.moveTo(0, zoomCanvas.height / 2);
-        ctx.lineTo(zoomCanvas.width, zoomCanvas.height / 2);
-        ctx.stroke();
-        ctx.restore();
-    },
-
-    renderPointsList: function() {
-        var list = this.elements.pointsList;
-        list.innerHTML = '';
-
-        if (this.points.length === 0) {
-            var emptyItem = document.createElement('li');
-            emptyItem.textContent = 'No points added yet.';
-            emptyItem.className = 'empty-state';
-            list.appendChild(emptyItem);
-            return;
-        }
-
-        for (var index = 0; index < this.points.length; index++) {
-            var point = this.points[index];
-            var item = document.createElement('li');
-            item.textContent = '#' + (index + 1) + ' — x: ' + point.x.toFixed(1) + ', y: ' + point.y.toFixed(1);
-            list.appendChild(item);
-        }
-    },
-
-    updatePointsCount: function() {
+wpd.MinimalApp.prototype.updatePointsCount = function() {
+    if (this.elements.pointsCountValue != null) {
         this.elements.pointsCountValue.textContent = String(this.points.length);
-    },
+    }
+};
 
-    updateSubmitOutput: function(value) {
-        this.elements.submitOutput.value = value;
-    },
+wpd.MinimalApp.prototype.submit = function() {
+    var payload = {
+        axis: 'image',
+        points: this.points.map(function(point, index) {
+            return {
+                id: index + 1,
+                x: Number(point.x.toFixed(2)),
+                y: Number(point.y.toFixed(2))
+            };
+        })
+    };
 
-    submit: function() {
-        var payload = {
-            axis: 'image',
-            points: this.points.map(function(point, index) {
-                return {
-                    id: index + 1,
-                    x: Number(point.x.toFixed(2)),
-                    y: Number(point.y.toFixed(2))
-                };
-            })
-        };
-        var serializedPayload = JSON.stringify(payload, null, 2);
-        this.updateSubmitOutput(serializedPayload);
-        window.dispatchEvent(new CustomEvent('wpd:submit', {
-            detail: payload
-        }));
+    this.lastSubmittedPayload = payload;
+    this.root.dispatchEvent(new CustomEvent('wpd:submit', {
+        bubbles: true,
+        detail: payload
+    }));
+};
+
+wpd.mountMinimalApp = function(rootElement) {
+    if (rootElement == null) {
+        return null;
+    }
+
+    if (rootElement.__wpdMinimalApp != null) {
+        return rootElement.__wpdMinimalApp;
+    }
+
+    var app = new wpd.MinimalApp(rootElement);
+    rootElement.__wpdMinimalApp = app;
+    app.init();
+    return app;
+};
+
+wpd.initMinimalApps = function() {
+    var appRoots = document.querySelectorAll('[data-wpd-app]');
+    for (var index = 0; index < appRoots.length; index++) {
+        wpd.mountMinimalApp(appRoots[index]);
     }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    wpd.app.init();
+    wpd.initMinimalApps();
 }, true);
