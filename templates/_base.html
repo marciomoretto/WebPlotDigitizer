@@ -23,7 +23,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="Description" content="WebPlotDigitizer v{{ wpdVersion }} - {{ _("Web based tool to extract numerical data from plots and graph images.") }}" />
+    <meta name="Description" content="WebPlotDigitizer v{{ wpdVersion }} - {{ _('Web based tool to extract numerical data from plots and graph images.') }}" />
     <meta name="Keywords" content="Plot, Digitizer, WebPlotDigitizer, Ankit Rohatgi, Extract Data, Convert Plots, XY, Polar, Ternary, Map, HTML5" />
     <meta name="Author" content="Ankit Rohatgi" />
     <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
@@ -35,114 +35,84 @@
     <link rel="stylesheet" href="styles/widgets.css" type="text/css" media="screen" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     {% block scripts %}{% endblock %}
-
-    <!-- thirdparty -->
-    <script type="module" src="node_modules/pdfjs-dist/build/pdf.min.mjs"></script>
-    <script src="node_modules/tarballjs/tarball.js"></script>
 </head>
 
 <body>
-
-    <div id="loadingCurtain" style="position: absolute; top: 0px; left: 0px; z-index: 100; width: 100%; height: 100%; background-color: white;">
-        {{ _("Loading application, please wait...") }}
-        <br />
-        <br />
-        {{ _("Problems loading? Make sure you have a recent version of Google Chrome, Firefox, Safari or Microsoft Edge installed.") }}
+    <div id="loadingCurtain">
+        {{ _('Loading application, please wait...') }}
     </div>
 
-    <div id="wpd-tooltip"></div>
+    <main id="minimalApp">
+        <section class="app-header">
+            <div>
+                <p class="eyebrow">WebPlotDigitizer</p>
+                <h1>{{ _('Minimal image digitizer') }}</h1>
+                <p class="subtle">{{ _('Open one image, zoom in the corner, add or delete points, and submit.') }}</p>
+            </div>
 
-    <div id="allContainer">
-        <!-- toolbar + graphics -->
-        <div id="mainContainer">
-            <div id="topContainer">
-                <div style="display: inline-block; width: 170px; text-align: center; padding-top: 9px;">
+            <div class="header-actions">
+                <label class="file-button" for="imageLoader">
+                    <i class="bi bi-image"></i>
+                    <span>{{ _('Open image') }}</span>
+                </label>
+                <input id="imageLoader" type="file" accept="image/*" />
+            </div>
+        </section>
 
-                    <img src="images/icon/icon.svg" width="18" height="18" style="vertical-align: middle;" />
+        <section class="toolbar-card">
+            <div class="control-group">
+                <span class="control-label">{{ _('Zoom') }}</span>
+                <button type="button" id="zoomOutBtn">{{ _('Zoom out') }}</button>
+                <button type="button" id="zoomInBtn">{{ _('Zoom in') }}</button>
+            </div>
 
-                    <a href="https://automeris.io" target="_blank" style="text-decoration: none; color: black; vertical-align: middle;">automeris.io</a>
-                </div>
-                <div id="menuButtonsContainer">{% include "_menubar.html" %}</div>
+            <div class="control-group">
+                <span class="control-label">{{ _('Mode') }}</span>
+                <button type="button" id="addPointBtn" class="pressed-button">{{ _('Add point') }}</button>
+                <button type="button" id="deletePointBtn">{{ _('Delete point') }}</button>
+            </div>
 
+            <div class="control-group axis-group">
+                <span class="control-label">{{ _('Axis') }}</span>
+                <span class="axis-pill">{{ _('Image') }}</span>
+            </div>
 
-                <div id="topToolbarContainer">
-                    <!-- controls that show on top -->
-                    <div style="position:relative;">
-                        <!-- Extra toolbars go here -->
-                        {% include "_toolbars.html" %}
+            <div class="control-group submit-group">
+                <button type="button" id="submitBtn" class="submit-button">{{ _('Submit') }}</button>
+            </div>
+        </section>
+
+        <section class="workspace-card">
+            <div class="canvas-panel">
+                <canvas id="imageCanvas" aria-label="Digitized image"></canvas>
+                <div class="zoom-panel">
+                    <div class="zoom-header">
+                        <span>{{ _('Zoom') }}</span>
+                        <span id="zoomLevelLabel">100%</span>
                     </div>
-                </div>
-
-                <div style="display: inline-block; width: 220px; text-align: right; padding-top: 9px;">
-                    <button type="button" onclick="wpd.graphicsWidget.rotateCounterClockwise();" class="toolbar-button has-tooltip" data-tooltip="Rotate 90° counter-clockwise">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    </button>
-                    <button type="button" onclick="wpd.graphicsWidget.rotateClockwise();" class="toolbar-button has-tooltip" data-tooltip="Rotate 90° clockwise">
-                        <i class="bi bi-arrow-clockwise"></i>
-                    </button>
-                    <button type="button" onclick="wpd.graphicsWidget.zoomIn();" class="toolbar-button has-tooltip" data-tooltip="Zoom In">+</button>
-                    <button type="button" onclick="wpd.graphicsWidget.zoomOut();" class="toolbar-button has-tooltip" data-tooltip="Zoom Out">-</button>
-                    <button type="button" onclick="wpd.graphicsWidget.zoom100perc();" class="toolbar-button has-tooltip" data-tooltip="View actual size">100%</button>
-                    <button type="button" onclick="wpd.graphicsWidget.zoomFit();" class="toolbar-button has-tooltip" data-tooltip="Fit image to screen">{{ _("Fit") }}</button>
-                    <button onclick="wpd.graphicsWidget.toggleExtendedCrosshairBtn();" class="toolbar-button has-tooltip" style="background-image: url('images/crosshair.png'); background-repeat: no-repeat; background-position: center;" id="extended-crosshair-btn" data-tooltip="Toggle extended crosshair">&nbsp;</button>
-                </div>
-
-            </div>
-
-            <div style="display: flex;">
-                <div id="left-side-container" style="width:200px; flex: 0 0 169px;">
-                    <!-- tree control -->
-                    {% include "_tree.html" %}
-                </div>
-
-                <div id="graphicsContainer" style="flex: 1;">
-                    <!-- the main canvas goes here -->
-                    <div id="canvasDiv" style="position:relative;">
-                        <canvas id="mainCanvas" class="canvasLayers" style="z-index:1;"></canvas>
-                        <canvas id="dataCanvas" class="canvasLayers" style="z-index:2;"></canvas>
-                        <canvas id="drawCanvas" class="canvasLayers" style="z-index:3;"></canvas>
-                        <canvas id="hoverCanvas" class="canvasLayers" style="z-index:4;"></canvas>
-                        <canvas id="topCanvas" class="canvasLayers" style="z-index:5;"></canvas>
-                    </div>
+                    <canvas id="zoomCanvas" width="220" height="220" aria-label="Zoom preview"></canvas>
+                    <p id="cursorReadout">x: -, y: -</p>
                 </div>
             </div>
 
-            <div id="bottomContainer">
-                <div id="bottomNavbarContainer">{% include "_navbar.html" %}</div>
-            </div>
-        </div>
-
-        <!-- sidebar + zoom -->
-        <div id="sidebarContainer">
-            <!-- zoom window goes here -->
-            <div style="position:relative;" id="zoomDiv">
-                <canvas id="zoomCanvas" class="zoomLayers" width=250 height=250 style="position:relative; top: 0px; left: 0px; z-index:1;"></canvas>
-                <canvas id="zoomCrossHair" class="zoomLayers" width=250 height=250 style="position:absolute; top: 0px; left: 0px; z-index:2; background:transparent;"></canvas>
-                <div id="cursorPosition" style="position:relative;">
-                    [<span id="mousePosition"></span>]
+            <aside class="sidebar-card">
+                <div>
+                    <p class="sidebar-title-text">{{ _('Axis') }}</p>
+                    <p id="axisInfo">{{ _('Fixed to image coordinates') }}</p>
                 </div>
-            </div>
 
-            <div id="zoom-settings-container">
-                <button id="zoom-settings-button" class="has-tooltip" onclick="wpd.zoomView.showSettingsWindow();" data-tooltip="Change zoom settings">
-                    <i class="bi bi-gear-fill"></i>
-                </button>
-            </div>
+                <div>
+                    <p class="sidebar-title-text">{{ _('Points') }}</p>
+                    <ol id="pointsList" class="points-list"></ol>
+                </div>
 
-            <div style="position:relative;" id="sidebarControlsContainer">
-                <!-- side bars go here -->
-                {% include "_sidebars.html" %}
-            </div>
-
-        </div>
-    </div>
-
-    <!-- popup windows go here -->
-    {% include "_popups.html" %}
-
-    <!-- strings for translation -->
-    {% include "_strings.html" %}
-
+                <div>
+                    <p class="sidebar-title-text">{{ _('Submit output') }}</p>
+                    <textarea id="submitOutput" readonly placeholder="[]"></textarea>
+                </div>
+            </aside>
+        </section>
+    </main>
 </body>
 
 </html>
