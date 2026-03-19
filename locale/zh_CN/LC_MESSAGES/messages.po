@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  WebPlotDigitizer\n"
+"Project-Id-Version:  ZenPlot\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-03-18 20:17+0000\n"
 "PO-Revision-Date: 2024-03-18 21:06+0800\n"
@@ -49,8 +49,8 @@ msgid "Help"
 msgstr "帮助"
 
 #: templates/_menubar.html:38
-msgid "About WebPlotDigitizer"
-msgstr "关于 WebPlotDigitizer"
+msgid "About ZenPlot"
+msgstr "关于 ZenPlot"
 
 #: templates/_menubar.html:40 templates/_menubar.html:42
 #: templates/_sidebars.html:223
@@ -181,7 +181,7 @@ msgstr ""
 #: templates/_popups.html:83
 msgid ""
 "Load a Javascript file to further extend the capabilities of "
-"WebPlotDigitizer."
+"ZenPlot."
 msgstr ""
 
 #: templates/_popups.html:84
@@ -189,7 +189,7 @@ msgid "For examples, visit the"
 msgstr ""
 
 #: templates/_popups.html:84
-msgid "WebPlotDigitizer repository"
+msgid "ZenPlot repository"
 msgstr ""
 
 #: templates/_popups.html:88 templates/_popups.html:528
@@ -313,7 +313,7 @@ msgid "Column Separator"
 msgstr ""
 
 #: templates/_popups.html:177
-msgid "WebPlotDigitizer - Extract Data From Charts"
+msgid "ZenPlot - Extract Data From Charts"
 msgstr ""
 
 #: templates/_popups.html:197
@@ -999,9 +999,9 @@ msgstr "警告：不稳定版本！"
 
 #: templates/_strings.html:22
 msgid ""
-"You are using a beta version of WebPlotDigitizer. There may be some "
+"You are using a beta version of ZenPlot. There may be some "
 "issues with the software that are expected."
-msgstr "您正在使用 WebPlotDigitizer 测试版。该软件可能存在某些问题。"
+msgstr "您正在使用 ZenPlot 测试版。该软件可能存在某些问题。"
 
 #: templates/_strings.html:24
 msgid "JSON/Project data has been loaded!"
@@ -1384,8 +1384,8 @@ msgstr ""
 #~ msgid "Stroke Width"
 #~ msgstr "笔画宽度"
 
-#~ msgid "WebPlotDigitizer-Examples repository"
-#~ msgstr "WebPlotDigitizer - 范例库"
+#~ msgid "ZenPlot-Examples repository"
+#~ msgstr "ZenPlot - 范例库"
 
 #~ msgid ""
 #~ "Please load a valid image file. "
@@ -1646,14 +1646,14 @@ msgstr ""
 
 #~ msgid ""
 #~ "Load a Javascript file to further "
-#~ "extend the capabilities of WebPlotDigitizer."
-#~ msgstr "加载 Javascript 文件以进一步扩展 WebPlotDigitizer 的功能。"
+#~ "extend the capabilities of ZenPlot."
+#~ msgstr "加载 Javascript 文件以进一步扩展 ZenPlot 的功能。"
 
 #~ msgid "For examples, visit the"
 #~ msgstr "如需示例，请访问"
 
-#~ msgid "WebPlotDigitizer repository"
-#~ msgstr "WebPlotDigitizer 存储库"
+#~ msgid "ZenPlot repository"
+#~ msgstr "ZenPlot 存储库"
 
 #~ msgid "Capture"
 #~ msgstr "拍照"
@@ -1731,8 +1731,8 @@ msgstr ""
 #~ msgid "Column Separator"
 #~ msgstr "列分隔符"
 
-#~ msgid "WebPlotDigitizer - Extract Data From Charts"
-#~ msgstr "WebPlotDigitizer - 基于Web的图像数字化工具"
+#~ msgid "ZenPlot - Extract Data From Charts"
+#~ msgstr "ZenPlot - 基于Web的图像数字化工具"
 
 #~ msgid "Export JSON or Project File"
 #~ msgstr "导出 JSON 或项目文件"

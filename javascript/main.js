@@ -1,5 +1,5 @@
 /*
-    WebPlotDigitizer - web based chart data extraction software (and more)
+    ZenPlot - web based chart data extraction software (and more)
 
     Copyright (C) 2025 Ankit Rohatgi
 
@@ -66,7 +66,7 @@ wpd.MinimalApp.prototype.init = function() {
         this.hideLoadingCurtain();
         this.root.dataset.wpdMounted = 'error';
         if (window.console != null && typeof window.console.error === 'function') {
-            window.console.error('WebPlotDigitizer minimal app initialization failed:', error);
+            window.console.error('ZenPlot minimal app initialization failed:', error);
         }
     }
 };

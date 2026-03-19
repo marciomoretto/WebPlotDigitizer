@@ -1,5 +1,5 @@
 /*
-    WebPlotDigitizer - web based chart data extraction software (and more)
+    ZenPlot - web based chart data extraction software (and more)
 
     Copyright (C) 2025 Ankit Rohatgi
 

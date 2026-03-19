@@ -1,1 +1,1 @@
-//= require main
+//= require zen_plot

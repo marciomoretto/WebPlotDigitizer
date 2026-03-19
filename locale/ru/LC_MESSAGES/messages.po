@@ -48,7 +48,7 @@ msgid "Help"
 msgstr ""
 
 #: templates/_menubar.html:38
-msgid "About WebPlotDigitizer"
+msgid "About ZenPlot"
 msgstr ""
 
 #: templates/_menubar.html:40 templates/_menubar.html:42
@@ -176,7 +176,7 @@ msgstr ""
 #: templates/_popups.html:83
 msgid ""
 "Load a Javascript file to further extend the capabilities of "
-"WebPlotDigitizer."
+"ZenPlot."
 msgstr ""
 
 #: templates/_popups.html:84
@@ -184,7 +184,7 @@ msgid "For examples, visit the"
 msgstr ""
 
 #: templates/_popups.html:84
-msgid "WebPlotDigitizer repository"
+msgid "ZenPlot repository"
 msgstr ""
 
 #: templates/_popups.html:88 templates/_popups.html:528
@@ -306,7 +306,7 @@ msgid "Column Separator"
 msgstr ""
 
 #: templates/_popups.html:177
-msgid "WebPlotDigitizer - Extract Data From Charts"
+msgid "ZenPlot - Extract Data From Charts"
 msgstr ""
 
 #: templates/_popups.html:197
@@ -970,7 +970,7 @@ msgstr ""
 
 #: templates/_strings.html:22
 msgid ""
-"You are using a beta version of WebPlotDigitizer. There may be some "
+"You are using a beta version of ZenPlot. There may be some "
 "issues with the software that are expected."
 msgstr ""
 
@@ -1413,7 +1413,7 @@ msgstr ""
 #~ msgid "Help"
 #~ msgstr ""
 
-#~ msgid "About WebPlotDigitizer"
+#~ msgid "About ZenPlot"
 #~ msgstr ""
 
 #~ msgid "Tutorials"
@@ -1461,7 +1461,7 @@ msgstr ""
 #~ msgid "Yellow"
 #~ msgstr ""
 
-#~ msgid "WebPlotDigitizer-Examples repository"
+#~ msgid "ZenPlot-Examples repository"
 #~ msgstr ""
 
 #~ msgid "Run"
@@ -1641,7 +1641,7 @@ msgstr ""
 #~ msgid "Click on the three corners in the order shown above."
 #~ msgstr ""
 
-#~ msgid "WebPlotDigitizer - Web Based Plot Digitizer"
+#~ msgid "ZenPlot - Web Based Plot Digitizer"
 #~ msgstr ""
 
 #~ msgid "Version"
@@ -2477,13 +2477,13 @@ msgstr ""
 
 #~ msgid ""
 #~ "Load a Javascript file to further "
-#~ "extend the capabilities of WebPlotDigitizer."
+#~ "extend the capabilities of ZenPlot."
 #~ msgstr ""
 
 #~ msgid "For examples, visit the"
 #~ msgstr ""
 
-#~ msgid "WebPlotDigitizer repository"
+#~ msgid "ZenPlot repository"
 #~ msgstr ""
 
 #~ msgid "Copy to Clipboard"
@@ -2500,7 +2500,7 @@ msgstr ""
 #~ "target=\"plotlyWebsite\">http://plot.ly</a> for details."
 #~ msgstr ""
 
-#~ msgid "WebPlotDigitizer - Extract Data From Charts"
+#~ msgid "ZenPlot - Extract Data From Charts"
 #~ msgstr ""
 
 #~ msgid "Export JSON or Project File"

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module WebPlotDigitizer
+module ZenPlot
   class ApplicationController < ActionController::Base
-    layout "web_plot_digitizer/application"
+    layout "zen_plot/application"
   end
 end

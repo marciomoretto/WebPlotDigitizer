@@ -1,4 +1,4 @@
-# Render HTML pages for WebPlotDigitizer
+# Render HTML pages for ZenPlot
 # NOTE: This requires Python 3
 
 import sys

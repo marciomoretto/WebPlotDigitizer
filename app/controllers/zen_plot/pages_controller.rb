@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module WebPlotDigitizer
+module ZenPlot
   class PagesController < ApplicationController
     def index
     end

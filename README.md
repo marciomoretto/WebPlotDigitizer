@@ -1,6 +1,6 @@
-# web_plot_digitizer (Rails Engine Gem)
+# ZenPlot (Rails Engine Gem)
 
-`web_plot_digitizer` is a mountable Rails engine gem that provides a minimal image digitizer UI.
+`zen_plot` is a mountable Rails engine gem that provides a minimal image digitizer UI.
 
 Install it in another Rails app, mount `/digitizer`, and start collecting points.
 
@@ -17,7 +17,7 @@ Install it in another Rails app, mount `/digitizer`, and start collecting points
 In host app `Gemfile`:
 
 ```ruby
-gem "web_plot_digitizer", path: "../WebPlotDigitizer"
+gem "zen_plot", path: "../ZenPlot"
 ```
 
 ### Option 2: git source
@@ -25,7 +25,7 @@ gem "web_plot_digitizer", path: "../WebPlotDigitizer"
 In host app `Gemfile`:
 
 ```ruby
-gem "web_plot_digitizer", git: "https://github.com/ankitrohatgi/WebPlotDigitizer.git", branch: "main"
+gem "zen_plot", git: "https://github.com/marciomoretto/ZenPlot.git", branch: "main"
 ```
 
 Then run:
@@ -39,25 +39,25 @@ bundle install
 ### 1) Generate initializer (recommended)
 
 ```bash
-bin/rails generate web_plot_digitizer:install
+bin/rails generate zen_plot:install
 ```
 
 This creates:
 
-- `config/initializers/web_plot_digitizer.rb`
+- `config/initializers/zen_plot.rb`
 
 ### 2) Mount the engine
 
 In host app `config/routes.rb`:
 
 ```ruby
-mount WebPlotDigitizer::Engine => "/digitizer"
+mount ZenPlot::Engine => "/digitizer"
 ```
 
 ### 3) Install and run migrations
 
 ```bash
-bin/rails web_plot_digitizer:install:migrations
+bin/rails zen_plot:install:migrations
 bin/rails db:migrate
 ```
 
@@ -71,15 +71,15 @@ Besides `/digitizer`, the gem exposes helper methods so you can render the compo
 
 Helpers:
 
-- `web_plot_digitizer_assets`
-- `web_plot_digitizer_component(...)`
+- `zen_plot_assets`
+- `zen_plot_component(...)`
 
 Example host page:
 
 ```erb
-<%= web_plot_digitizer_assets %>
+<%= zen_plot_assets %>
 
-<%= web_plot_digitizer_component(
+<%= zen_plot_component(
   show_header: true,
   show_toolbar: false,
   show_controls: true,
@@ -96,12 +96,12 @@ If you want to customize structure/markup, create files in your host app with th
 
 Example override:
 
-- Host file: `app/views/web_plot_digitizer/pages/_controls.html.erb`
+- Host file: `app/views/zen_plot/pages/_controls.html.erb`
 
 That file takes precedence over the gem partial and is used in both:
 
 - `GET /digitizer`
-- `web_plot_digitizer_component(...)` embeds
+- `zen_plot_component(...)` embeds
 
 This gives you full control over layout while keeping gem JS/events/contracts.
 
@@ -113,8 +113,8 @@ This gives you full control over layout while keeping gem JS/events/contracts.
 
 ### View helpers (host app)
 
-- `web_plot_digitizer_assets`
-- `web_plot_digitizer_component(**overrides)`
+- `zen_plot_assets`
+- `zen_plot_component(**overrides)`
 
 ### Persistence endpoint
 
@@ -139,10 +139,10 @@ Responses:
 
 ## Configuration (Initializer)
 
-Use `config/initializers/web_plot_digitizer.rb`:
+Use `config/initializers/zen_plot.rb`:
 
 ```ruby
-WebPlotDigitizer.configure do |config|
+ZenPlot.configure do |config|
   # Regions
   config.show_header = false
   config.show_toolbar = false
@@ -217,17 +217,27 @@ or:
 From this repository:
 
 ```bash
-gem build web_plot_digitizer.gemspec
+gem build zen_plot.gemspec
 ```
 
 This generates a package like:
 
-- `web_plot_digitizer-5.3.0.gem`
+- `zen_plot-5.3.0.gem`
 
 ## Notes
 
-- The gem is a Rails engine (`WebPlotDigitizer::Engine`) and isolates its namespace.
+- The gem is a Rails engine (`ZenPlot::Engine`) and isolates its namespace.
 - If host app does not load ActiveRecord railtie, persistence endpoint will not be available.
+
+## Attribution and Origin
+
+ZenPlot is a derivative work based on the original WebPlotDigitizer project by Ankit Rohatgi.
+
+- Original project: https://github.com/ankitrohatgi/WebPlotDigitizer
+- License: GNU AGPL v3
+- This repository contains modifications and repackaging performed by the ZenCrowd team.
+
+See `NOTICE` for attribution details.
 
 ## License
 

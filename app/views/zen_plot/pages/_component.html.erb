@@ -27,16 +27,16 @@
   </div>
 
   <% if show_header %>
-    <%= render "web_plot_digitizer/pages/header" %>
+    <%= render "zen_plot/pages/header" %>
   <% end %>
 
   <% if show_toolbar %>
-    <%= render "web_plot_digitizer/pages/toolbar", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
+    <%= render "zen_plot/pages/toolbar", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
   <% end %>
 
   <% if show_controls %>
-    <%= render "web_plot_digitizer/pages/controls", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
+    <%= render "zen_plot/pages/controls", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
   <% end %>
 
-  <%= render "web_plot_digitizer/pages/workspace", show_zoom_panel: show_zoom_panel %>
+  <%= render "zen_plot/pages/workspace", show_zoom_panel: show_zoom_panel %>
 </main>

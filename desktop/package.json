@@ -1,5 +1,5 @@
 {
-  "name": "webplotdigitizer",
+  "name": "zenplot",
   "version": "5.0.0",
   "description": "Extract data from charts",
   "main": "index.js",

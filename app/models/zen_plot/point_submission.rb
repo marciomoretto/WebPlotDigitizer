@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module WebPlotDigitizer
+module ZenPlot
   class PointSubmission < ActiveRecord::Base
     validates :axis, presence: true
     validate :points_must_be_an_array

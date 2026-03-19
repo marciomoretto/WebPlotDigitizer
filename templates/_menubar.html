@@ -1,5 +1,5 @@
 {#
-    WebPlotDigitizer - web based chart data extraction software (and more)
+    ZenPlot - web based chart data extraction software (and more)
 
     Copyright (C) 2025 Ankit Rohatgi
 
@@ -35,12 +35,12 @@
     <div class="wpd-menu-header">{{ _("Help") }}</div>
     <div class="wpd-menu-dropdown">
         <ul>
-            <li id="wpd-helpmenu-about" onclick="wpd.popup.show('helpWindow');">{{ _("About WebPlotDigitizer") }}</li>
+            <li id="wpd-helpmenu-about" onclick="wpd.popup.show('helpWindow');">{{ _("About ZenPlot") }}</li>
             {% if app_mode == 'cloud' %}
             <li id="wpd-helpmenu-manual" onclick="window.open('/docs/', '_blank');">{{ _("User Manual") }}</li>
             {% else %}
             <li id="wpd-helpmenu-manual" onclick="window.open('https://automeris.io/docs/', '_blank');">{{ _("User Manual") }}</li>
-            <li id="wpd-helpmenu-manual" onclick="window.open('https://github.com/automeris-io/WebPlotDigitizer/issues', '_blank');">{{ _("Report Issues") }}</li>
+            <li id="wpd-helpmenu-manual" onclick="window.open('https://github.com/automeris-io/ZenPlot/issues', '_blank');">{{ _("Report Issues") }}</li>
             {% endif %}
         </ul>
     </div>

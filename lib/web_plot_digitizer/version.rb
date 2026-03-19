@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-module WebPlotDigitizer
-  VERSION = "5.3.0"
-end
+require_relative "../zen_plot/version"
+
+WebPlotDigitizer = ZenPlot unless defined?(WebPlotDigitizer)

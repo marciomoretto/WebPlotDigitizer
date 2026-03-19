@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module WebPlotDigitizer
+module ZenPlot
   class PointSubmissionsController < ApplicationController
     def create
       return render_active_record_unavailable unless active_record_available?
