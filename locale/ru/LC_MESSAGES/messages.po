@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-25 23:01-0700\n"
+"POT-Creation-Date: 2026-03-18 20:17+0000\n"
 "PO-Revision-Date: 2016-12-18 10:38-0600\n"
 "Last-Translator: \n"
 "Language: ru\n"
@@ -17,24 +17,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.16.0\n"
 
 #: templates/_base.html:26
 msgid "Web based tool to extract numerical data from plots and graph images."
-msgstr ""
-
-#: templates/_base.html:47
-msgid "Loading application, please wait..."
-msgstr ""
-
-#: templates/_base.html:50
-msgid ""
-"Problems loading? Make sure you have a recent version of Google Chrome, "
-"Firefox, Safari or Microsoft Edge installed."
-msgstr ""
-
-#: templates/_base.html:86
-msgid "Fit"
 msgstr ""
 
 #: templates/_menubar.html:21
@@ -72,6 +58,54 @@ msgstr ""
 
 #: templates/_menubar.html:43
 msgid "Report Issues"
+msgstr ""
+
+#: templates/_minimal_app.html:3
+msgid "Loading application, please wait..."
+msgstr ""
+
+#: templates/_minimal_header.html:4
+msgid "Minimal image digitizer"
+msgstr ""
+
+#: templates/_minimal_header.html:5
+msgid "Open one image, zoom in the corner, add or delete points, and submit."
+msgstr ""
+
+#: templates/_minimal_header.html:11
+msgid "Open image"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:3 templates/_minimal_workspace.html:6
+msgid "Zoom"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:4
+msgid "Zoom out"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:5
+msgid "Zoom in"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:9
+msgid "Mode"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:10
+msgid "Add point"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:11 templates/_popups.html:247
+msgid "Delete point"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:15
+msgid "Points"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:20
+msgid "Submit"
 msgstr ""
 
 #: templates/_navbar.html:27
@@ -351,10 +385,6 @@ msgstr ""
 
 #: templates/_popups.html:246
 msgid "Del/Backspace"
-msgstr ""
-
-#: templates/_popups.html:247
-msgid "Delete point"
 msgstr ""
 
 #: templates/_popups.html:251
@@ -2649,5 +2679,12 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Simplified Chinese"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Problems loading? Make sure you have "
+#~ "a recent version of Google Chrome, "
+#~ "Firefox, Safari or Microsoft Edge "
+#~ "installed."
 #~ msgstr ""
 

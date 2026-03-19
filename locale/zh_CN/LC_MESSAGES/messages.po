@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  WebPlotDigitizer\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-25 23:01-0700\n"
+"POT-Creation-Date: 2026-03-18 20:17+0000\n"
 "PO-Revision-Date: 2024-03-18 21:06+0800\n"
 "Last-Translator: nkh0472 <nkh0472@hotmail.com>\n"
 "Language: zh_CN\n"
@@ -16,25 +16,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.16.0\n"
 
 #: templates/_base.html:26
 msgid "Web based tool to extract numerical data from plots and graph images."
 msgstr "基于Web的工具，用于从绘图和图形图像中提取数据。"
-
-#: templates/_base.html:47
-msgid "Loading application, please wait..."
-msgstr "启动中，请稍等……"
-
-#: templates/_base.html:50
-msgid ""
-"Problems loading? Make sure you have a recent version of Google Chrome, "
-"Firefox, Safari or Microsoft Edge installed."
-msgstr "启动错误？ 请确认您安装了最新版本的Google Chrome，Firefox，Safari 或 Microsoft Edge。"
-
-#: templates/_base.html:86
-msgid "Fit"
-msgstr "适合"
 
 #: templates/_menubar.html:21
 msgid "File"
@@ -73,6 +59,58 @@ msgstr "用户手册"
 
 #: templates/_menubar.html:43
 msgid "Report Issues"
+msgstr ""
+
+#: templates/_minimal_app.html:3
+msgid "Loading application, please wait..."
+msgstr "启动中，请稍等……"
+
+#: templates/_minimal_header.html:4
+msgid "Minimal image digitizer"
+msgstr ""
+
+#: templates/_minimal_header.html:5
+msgid "Open one image, zoom in the corner, add or delete points, and submit."
+msgstr ""
+
+#: templates/_minimal_header.html:11
+#, fuzzy
+msgid "Open image"
+msgstr "导入图片"
+
+#: templates/_minimal_toolbar.html:3 templates/_minimal_workspace.html:6
+msgid "Zoom"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:4
+msgid "Zoom out"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:5
+msgid "Zoom in"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:9
+msgid "Mode"
+msgstr ""
+
+#: templates/_minimal_toolbar.html:10
+#, fuzzy
+msgid "Add point"
+msgstr "增加点"
+
+#: templates/_minimal_toolbar.html:11 templates/_popups.html:247
+#, fuzzy
+msgid "Delete point"
+msgstr "删除点"
+
+#: templates/_minimal_toolbar.html:15
+#, fuzzy
+msgid "Points"
+msgstr "数据点数"
+
+#: templates/_minimal_toolbar.html:20
+msgid "Submit"
 msgstr ""
 
 #: templates/_navbar.html:27
@@ -359,11 +397,6 @@ msgstr "删除点"
 #: templates/_popups.html:246
 msgid "Del/Backspace"
 msgstr ""
-
-#: templates/_popups.html:247
-#, fuzzy
-msgid "Delete point"
-msgstr "删除点"
 
 #: templates/_popups.html:251
 msgid "Edit label (Bar Chart)"
@@ -1974,4 +2007,14 @@ msgstr ""
 
 #~ msgid "Simplified Chinese"
 #~ msgstr ""
+
+#~ msgid ""
+#~ "Problems loading? Make sure you have "
+#~ "a recent version of Google Chrome, "
+#~ "Firefox, Safari or Microsoft Edge "
+#~ "installed."
+#~ msgstr "启动错误？ 请确认您安装了最新版本的Google Chrome，Firefox，Safari 或 Microsoft Edge。"
+
+#~ msgid "Fit"
+#~ msgstr "适合"
 

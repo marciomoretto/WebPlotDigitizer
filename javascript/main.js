@@ -27,21 +27,48 @@ wpd.MinimalApp = function(rootElement) {
     this.zoomStep = 1.25;
     this.mode = 'add';
     this.markerRadius = 5;
+    this.markerColor = '#ef4444';
     this.points = [];
     this.hoverImagePoint = null;
     this.image = null;
     this.objectUrl = null;
     this.lastSubmittedPayload = null;
+    this.lastStoredSubmission = null;
+    this.lastLoadedPointsPayload = null;
     this.elements = {};
+    this.zoomDrag = {
+        active: false,
+        pointerId: null,
+        offsetX: 0,
+        offsetY: 0
+    };
+    this.handleZoomDragMoveBound = this.handleZoomDragMove.bind(this);
+    this.handleZoomDragEndBound = this.handleZoomDragEnd.bind(this);
 };
 
 wpd.MinimalApp.prototype.init = function() {
-    this.cacheElements();
-    this.bindEvents();
-    this.updatePointsCount();
-    this.loadDefaultImage();
-    this.hideLoadingCurtain();
-    this.root.dataset.wpdMounted = 'true';
+    try {
+        this.cacheElements();
+        // Hide the loading curtain as soon as core elements are cached.
+        this.hideLoadingCurtain();
+        this.bindEvents();
+        this.applyMarkerColorFromPicker();
+        this.updatePointsCount();
+        var defaultImageRequest = this.loadDefaultImage();
+        if (defaultImageRequest != null && typeof defaultImageRequest.catch === 'function') {
+            defaultImageRequest.catch(function() {
+                return null;
+            });
+        }
+        this.loadDefaultPoints(defaultImageRequest);
+        this.root.dataset.wpdMounted = 'true';
+    } catch (error) {
+        this.hideLoadingCurtain();
+        this.root.dataset.wpdMounted = 'error';
+        if (window.console != null && typeof window.console.error === 'function') {
+            window.console.error('WebPlotDigitizer minimal app initialization failed:', error);
+        }
+    }
 };
 
 wpd.MinimalApp.prototype.query = function(selector) {
@@ -52,8 +79,11 @@ wpd.MinimalApp.prototype.cacheElements = function() {
     this.elements.loadingCurtain = this.query('[data-wpd-loading-curtain]');
     this.elements.canvas = this.query('[data-wpd-image-canvas]');
     this.elements.ctx = this.elements.canvas.getContext('2d');
+    this.elements.zoomPanel = this.query('.zoom-panel');
+    this.elements.zoomHeader = this.query('.zoom-header');
     this.elements.zoomCanvas = this.query('[data-wpd-zoom-canvas]');
-    this.elements.zoomCtx = this.elements.zoomCanvas.getContext('2d');
+    this.elements.zoomCtx = this.elements.zoomCanvas != null ? this.elements.zoomCanvas.getContext('2d') : null;
+    this.elements.zoomToggleBtn = this.query('[data-wpd-zoom-toggle]');
     this.elements.imageLoader = this.query('[data-wpd-image-loader]');
     this.elements.zoomInBtn = this.query('[data-wpd-zoom-in]');
     this.elements.zoomOutBtn = this.query('[data-wpd-zoom-out]');
@@ -61,28 +91,227 @@ wpd.MinimalApp.prototype.cacheElements = function() {
     this.elements.deletePointBtn = this.query('[data-wpd-delete-point]');
     this.elements.submitBtn = this.query('[data-wpd-submit]');
     this.elements.pointsCountValue = this.query('[data-wpd-points-count]');
+    this.elements.pointColorPicker = this.query('[data-wpd-point-color-picker]');
     this.elements.hotkeysScope = this.query('[data-wpd-hotkeys-scope]');
     this.elements.cursorReadout = this.query('[data-wpd-cursor-readout]');
     this.elements.zoomLevelLabel = this.query('[data-wpd-zoom-level]');
 };
 
 wpd.MinimalApp.prototype.bindEvents = function() {
-    this.elements.imageLoader.addEventListener('change', this.handleImageUpload.bind(this));
-    this.elements.zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
-    this.elements.zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
-    this.elements.addPointBtn.addEventListener('click', this.setMode.bind(this, 'add'));
-    this.elements.deletePointBtn.addEventListener('click', this.setMode.bind(this, 'delete'));
-    this.elements.submitBtn.addEventListener('click', this.submit.bind(this));
-    this.elements.hotkeysScope.addEventListener('keydown', this.handleHotkeys.bind(this));
-    this.elements.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
-    this.elements.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
-    this.elements.canvas.addEventListener('mouseleave', this.handlePointerLeave.bind(this));
+    if (this.elements.imageLoader != null) {
+        this.elements.imageLoader.addEventListener('change', this.handleImageUpload.bind(this));
+    }
+
+    if (this.elements.zoomInBtn != null) {
+        this.elements.zoomInBtn.addEventListener('click', this.zoomIn.bind(this));
+    }
+
+    if (this.elements.zoomOutBtn != null) {
+        this.elements.zoomOutBtn.addEventListener('click', this.zoomOut.bind(this));
+    }
+
+    if (this.elements.zoomToggleBtn != null) {
+        this.elements.zoomToggleBtn.addEventListener('click', this.toggleZoomPanel.bind(this));
+    }
+
+    if (this.elements.zoomHeader != null) {
+        this.elements.zoomHeader.addEventListener('pointerdown', this.handleZoomDragStart.bind(this));
+    }
+
+    if (this.elements.addPointBtn != null) {
+        this.elements.addPointBtn.addEventListener('click', this.setMode.bind(this, 'add'));
+    }
+
+    if (this.elements.deletePointBtn != null) {
+        this.elements.deletePointBtn.addEventListener('click', this.setMode.bind(this, 'delete'));
+    }
+
+    if (this.elements.submitBtn != null) {
+        this.elements.submitBtn.addEventListener('click', this.submit.bind(this));
+    }
+
+    if (this.elements.pointColorPicker != null) {
+        this.elements.pointColorPicker.addEventListener('input', this.handlePointColorChange.bind(this));
+        this.elements.pointColorPicker.addEventListener('change', this.handlePointColorChange.bind(this));
+    }
+
+    if (this.elements.hotkeysScope != null) {
+        this.elements.hotkeysScope.addEventListener('keydown', this.handleHotkeys.bind(this));
+    }
+
+    if (this.elements.canvas != null) {
+        this.elements.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
+        this.elements.canvas.addEventListener('mousemove', this.handlePointerMove.bind(this));
+        this.elements.canvas.addEventListener('mouseleave', this.handlePointerLeave.bind(this));
+    }
+
     window.addEventListener('resize', this.render.bind(this));
 };
 
+wpd.MinimalApp.prototype.isValidHexColor = function(colorValue) {
+    return typeof colorValue === 'string' && /^#[0-9a-fA-F]{6}$/.test(colorValue);
+};
+
+wpd.MinimalApp.prototype.applyMarkerColorFromPicker = function() {
+    if (this.elements.pointColorPicker == null) {
+        return;
+    }
+
+    this.setMarkerColor(this.elements.pointColorPicker.value, false);
+};
+
+wpd.MinimalApp.prototype.setMarkerColor = function(colorValue, shouldRender) {
+    if (!this.isValidHexColor(colorValue)) {
+        return;
+    }
+
+    this.markerColor = colorValue;
+
+    if (this.elements.pointColorPicker != null && this.elements.pointColorPicker.value !== colorValue) {
+        this.elements.pointColorPicker.value = colorValue;
+    }
+
+    if (shouldRender !== false) {
+        this.render();
+    }
+};
+
+wpd.MinimalApp.prototype.handlePointColorChange = function(event) {
+    this.setMarkerColor(event.target.value);
+};
+
+wpd.MinimalApp.prototype.canDragZoomPanel = function() {
+    if (this.elements.zoomPanel == null) {
+        return false;
+    }
+
+    return window.getComputedStyle(this.elements.zoomPanel).position === 'fixed';
+};
+
+wpd.MinimalApp.prototype.handleZoomDragStart = function(event) {
+    if (!this.canDragZoomPanel()) {
+        return;
+    }
+
+    if (event.button != null && event.button !== 0) {
+        return;
+    }
+
+    if (event.target != null && typeof event.target.closest === 'function' && event.target.closest('[data-wpd-zoom-toggle]') != null) {
+        return;
+    }
+
+    var panelRect = this.elements.zoomPanel.getBoundingClientRect();
+    this.zoomDrag.active = true;
+    this.zoomDrag.pointerId = event.pointerId;
+    this.zoomDrag.offsetX = event.clientX - panelRect.left;
+    this.zoomDrag.offsetY = event.clientY - panelRect.top;
+
+    this.elements.zoomPanel.classList.add('is-dragging');
+
+    if (this.elements.zoomHeader != null && typeof this.elements.zoomHeader.setPointerCapture === 'function' && event.pointerId != null) {
+        this.elements.zoomHeader.setPointerCapture(event.pointerId);
+    }
+
+    window.addEventListener('pointermove', this.handleZoomDragMoveBound);
+    window.addEventListener('pointerup', this.handleZoomDragEndBound);
+    window.addEventListener('pointercancel', this.handleZoomDragEndBound);
+
+    event.preventDefault();
+};
+
+wpd.MinimalApp.prototype.handleZoomDragMove = function(event) {
+    if (!this.zoomDrag.active || this.elements.zoomPanel == null) {
+        return;
+    }
+
+    if (this.zoomDrag.pointerId != null && event.pointerId != null && event.pointerId !== this.zoomDrag.pointerId) {
+        return;
+    }
+
+    var margin = 8;
+    var panelWidth = this.elements.zoomPanel.offsetWidth;
+    var panelHeight = this.elements.zoomPanel.offsetHeight;
+    var maxLeft = Math.max(margin, window.innerWidth - panelWidth - margin);
+    var maxTop = Math.max(margin, window.innerHeight - panelHeight - margin);
+
+    var nextLeft = event.clientX - this.zoomDrag.offsetX;
+    var nextTop = event.clientY - this.zoomDrag.offsetY;
+
+    nextLeft = Math.max(margin, Math.min(nextLeft, maxLeft));
+    nextTop = Math.max(margin, Math.min(nextTop, maxTop));
+
+    this.elements.zoomPanel.style.left = nextLeft + 'px';
+    this.elements.zoomPanel.style.top = nextTop + 'px';
+    this.elements.zoomPanel.style.right = 'auto';
+    this.elements.zoomPanel.style.bottom = 'auto';
+};
+
+wpd.MinimalApp.prototype.handleZoomDragEnd = function(event) {
+    if (!this.zoomDrag.active) {
+        return;
+    }
+
+    if (this.zoomDrag.pointerId != null && event.pointerId != null && event.pointerId !== this.zoomDrag.pointerId) {
+        return;
+    }
+
+    this.zoomDrag.active = false;
+
+    if (this.elements.zoomPanel != null) {
+        this.elements.zoomPanel.classList.remove('is-dragging');
+    }
+
+    if (this.elements.zoomHeader != null && typeof this.elements.zoomHeader.releasePointerCapture === 'function' && event.pointerId != null) {
+        try {
+            this.elements.zoomHeader.releasePointerCapture(event.pointerId);
+        } catch (error) {
+            // Ignore capture release errors from already-released pointers.
+        }
+    }
+
+    this.zoomDrag.pointerId = null;
+    window.removeEventListener('pointermove', this.handleZoomDragMoveBound);
+    window.removeEventListener('pointerup', this.handleZoomDragEndBound);
+    window.removeEventListener('pointercancel', this.handleZoomDragEndBound);
+};
+
+wpd.MinimalApp.prototype.isZoomPanelCollapsed = function() {
+    return this.elements.zoomPanel != null && this.elements.zoomPanel.classList.contains('is-collapsed');
+};
+
+wpd.MinimalApp.prototype.updateZoomToggleButton = function() {
+    if (this.elements.zoomToggleBtn == null) {
+        return;
+    }
+
+    var isCollapsed = this.isZoomPanelCollapsed();
+    var expandLabel = this.elements.zoomToggleBtn.dataset.labelExpand || 'Maximize zoom';
+    var collapseLabel = this.elements.zoomToggleBtn.dataset.labelCollapse || 'Minimize zoom';
+    var label = isCollapsed ? expandLabel : collapseLabel;
+
+    this.elements.zoomToggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+    this.elements.zoomToggleBtn.setAttribute('aria-label', label);
+    this.elements.zoomToggleBtn.setAttribute('title', label);
+};
+
+wpd.MinimalApp.prototype.toggleZoomPanel = function() {
+    if (this.elements.zoomPanel == null) {
+        return;
+    }
+
+    this.elements.zoomPanel.classList.toggle('is-collapsed');
+    this.updateZoomToggleButton();
+};
+
 wpd.MinimalApp.prototype.hideLoadingCurtain = function() {
-    if (this.elements.loadingCurtain != null) {
-        this.elements.loadingCurtain.style.display = 'none';
+    var loadingCurtain = this.elements.loadingCurtain;
+    if (loadingCurtain == null) {
+        loadingCurtain = this.query('[data-wpd-loading-curtain]');
+    }
+
+    if (loadingCurtain != null) {
+        loadingCurtain.style.display = 'none';
     }
 };
 
@@ -90,8 +319,13 @@ wpd.MinimalApp.prototype.getDefaultImageUrl = function() {
     return this.root.dataset.wpdDefaultImage || 'start.png';
 };
 
+wpd.MinimalApp.prototype.getDefaultPointsUrl = function() {
+    return this.root.dataset.wpdDefaultPoints || '';
+};
+
 wpd.MinimalApp.prototype.loadDefaultImage = function() {
-    this.loadImageFromUrl(this.getDefaultImageUrl());
+    this.updateZoomToggleButton();
+    return this.loadImageFromUrl(this.getDefaultImageUrl());
 };
 
 wpd.MinimalApp.prototype.handleImageUpload = function(event) {
@@ -105,31 +339,180 @@ wpd.MinimalApp.prototype.handleImageUpload = function(event) {
     }
 
     this.objectUrl = URL.createObjectURL(file);
-    this.loadImageFromUrl(this.objectUrl);
+    this.loadImageFromUrl(this.objectUrl).catch(function() {
+        // Keep the current image if the uploaded file cannot be decoded.
+    });
 };
 
 wpd.MinimalApp.prototype.loadImageFromUrl = function(url) {
     var app = this;
-    var image = new Image();
-    image.onload = function() {
-        app.image = image;
-        app.points = [];
-        app.scale = 1;
-        app.hoverImagePoint = {
-            x: image.width / 2,
-            y: image.height / 2
+
+    return new Promise(function(resolve, reject) {
+        var image = new Image();
+
+        image.onload = function() {
+            app.image = image;
+            app.points = [];
+            app.scale = 1;
+            app.hoverImagePoint = {
+                x: image.width / 2,
+                y: image.height / 2
+            };
+            app.render();
+            app.updatePointsCount();
+            resolve(image);
         };
-        app.render();
+
+        image.onerror = function() {
+            reject(new Error('Failed to load image'));
+        };
+
+        image.src = url;
+    });
+};
+
+wpd.MinimalApp.prototype.loadDefaultPoints = function(waitForImagePromise) {
+    var pointsUrl = this.getDefaultPointsUrl();
+    if (typeof pointsUrl !== 'string' || pointsUrl.trim() === '' || typeof window.fetch !== 'function') {
+        return;
+    }
+
+    var app = this;
+    var imageReady = waitForImagePromise;
+    if (imageReady == null || typeof imageReady.then !== 'function') {
+        imageReady = Promise.resolve();
+    }
+
+    imageReady.catch(function() {
+        return null;
+    }).then(function() {
+        return window.fetch(pointsUrl, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+    }).then(function(response) {
+        return response.json().then(function(body) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: body
+            };
+        }).catch(function() {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: null
+            };
+        });
+    }).then(function(result) {
+        if (!result.ok) {
+            throw new Error('Failed to load default points (status ' + result.status + ')');
+        }
+
+        var parsed = app.parseDefaultPointsPayload(result.body);
+        app.points = parsed.points;
+        app.lastLoadedPointsPayload = parsed.payload;
         app.updatePointsCount();
+        app.render();
+        app.root.dispatchEvent(new CustomEvent('wpd:points:loaded', {
+            bubbles: true,
+            detail: {
+                axis: parsed.axis,
+                points: parsed.payload.points,
+                points_count: parsed.points.length
+            }
+        }));
+    }).catch(function(error) {
+        app.root.dispatchEvent(new CustomEvent('wpd:points:load-error', {
+            bubbles: true,
+            detail: {
+                message: error.message
+            }
+        }));
+    });
+};
+
+wpd.MinimalApp.prototype.parseDefaultPointsPayload = function(payload) {
+    var axis = 'image';
+    var rawPoints = payload;
+
+    if (payload != null && !Array.isArray(payload) && typeof payload === 'object') {
+        axis = typeof payload.axis === 'string' && payload.axis.trim() !== '' ? payload.axis : 'image';
+        rawPoints = payload.points;
+    }
+
+    if (!Array.isArray(rawPoints)) {
+        throw new Error('Default points payload must be an array or include a points array');
+    }
+
+    var normalizedPayloadPoints = [];
+    var normalizedPoints = [];
+
+    for (var index = 0; index < rawPoints.length; index++) {
+        var point = rawPoints[index];
+        if (point == null || typeof point !== 'object') {
+            throw new Error('Point entry ' + (index + 1) + ' must be an object');
+        }
+
+        var x = this.toFiniteNumber(point.x);
+        var y = this.toFiniteNumber(point.y);
+
+        if (x == null || y == null) {
+            throw new Error('Point entry ' + (index + 1) + ' must include numeric x and y');
+        }
+
+        normalizedPoints.push({
+            x: x,
+            y: y
+        });
+
+        normalizedPayloadPoints.push({
+            id: point.id == null ? (index + 1) : point.id,
+            x: x,
+            y: y
+        });
+    }
+
+    return {
+        axis: axis,
+        points: normalizedPoints,
+        payload: {
+            axis: axis,
+            points: normalizedPayloadPoints
+        }
     };
-    image.src = url;
+};
+
+wpd.MinimalApp.prototype.toFiniteNumber = function(value) {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : null;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+        var parsedValue = Number(value);
+        return Number.isFinite(parsedValue) ? parsedValue : null;
+    }
+
+    return null;
 };
 
 wpd.MinimalApp.prototype.setMode = function(mode) {
     this.mode = mode;
-    this.elements.addPointBtn.classList.toggle('pressed-button', mode === 'add');
-    this.elements.deletePointBtn.classList.toggle('pressed-button', mode === 'delete');
-    this.elements.canvas.classList.toggle('delete-mode', mode === 'delete');
+
+    if (this.elements.addPointBtn != null) {
+        this.elements.addPointBtn.classList.toggle('pressed-button', mode === 'add');
+    }
+
+    if (this.elements.deletePointBtn != null) {
+        this.elements.deletePointBtn.classList.toggle('pressed-button', mode === 'delete');
+    }
+
+    if (this.elements.canvas != null) {
+        this.elements.canvas.classList.toggle('delete-mode', mode === 'delete');
+    }
 };
 
 wpd.MinimalApp.prototype.zoomIn = function() {
@@ -154,7 +537,9 @@ wpd.MinimalApp.prototype.handleCanvasClick = function(event) {
         this.deleteNearestPoint(imagePoint);
     }
 
-    this.elements.hotkeysScope.focus();
+    if (this.elements.hotkeysScope != null) {
+        this.elements.hotkeysScope.focus();
+    }
     this.hoverImagePoint = imagePoint;
     this.render();
     this.updatePointsCount();
@@ -197,13 +582,17 @@ wpd.MinimalApp.prototype.handlePointerMove = function(event) {
     }
 
     this.hoverImagePoint = imagePoint;
-    this.elements.cursorReadout.textContent = 'x: ' + imagePoint.x.toFixed(1) + ', y: ' + imagePoint.y.toFixed(1);
+    if (this.elements.cursorReadout != null) {
+        this.elements.cursorReadout.textContent = 'x: ' + imagePoint.x.toFixed(1) + ', y: ' + imagePoint.y.toFixed(1);
+    }
     this.renderZoom();
 };
 
 wpd.MinimalApp.prototype.handlePointerLeave = function() {
     this.hoverImagePoint = null;
-    this.elements.cursorReadout.textContent = 'x: -, y: -';
+    if (this.elements.cursorReadout != null) {
+        this.elements.cursorReadout.textContent = 'x: -, y: -';
+    }
     this.renderZoom();
 };
 
@@ -265,36 +654,39 @@ wpd.MinimalApp.prototype.render = function() {
 
     for (var index = 0; index < this.points.length; index++) {
         var point = this.points[index];
-        this.drawPoint(ctx, point, index + 1);
+        this.drawPoint(ctx, point);
     }
 
-    this.elements.zoomLevelLabel.textContent = Math.round(this.scale * 100) + '%';
+    if (this.elements.zoomLevelLabel != null) {
+        this.elements.zoomLevelLabel.textContent = Math.round(this.scale * 100) + '%';
+    }
     this.renderZoom();
 };
 
-wpd.MinimalApp.prototype.drawPoint = function(ctx, point, label) {
+wpd.MinimalApp.prototype.drawPoint = function(ctx, point) {
     var screenX = point.x * this.scale;
     var screenY = point.y * this.scale;
     var radius = this.markerRadius + Math.max(0, this.scale - 1.0);
 
     ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = '#ef4444';
+    ctx.fillStyle = this.markerColor;
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
     ctx.arc(screenX, screenY, radius, 0, Math.PI * 2, false);
     ctx.fill();
     ctx.stroke();
-
-    ctx.fillStyle = '#111827';
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillText(String(label), screenX + radius + 4, screenY - radius - 4);
     ctx.restore();
 };
 
 wpd.MinimalApp.prototype.renderZoom = function() {
     var ctx = this.elements.zoomCtx;
     var zoomCanvas = this.elements.zoomCanvas;
+
+    if (ctx == null || zoomCanvas == null) {
+        return;
+    }
+
     ctx.clearRect(0, 0, zoomCanvas.width, zoomCanvas.height);
     ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(0, 0, zoomCanvas.width, zoomCanvas.height);
@@ -306,9 +698,31 @@ wpd.MinimalApp.prototype.renderZoom = function() {
     var sourceSize = 40;
     var sx = Math.max(0, Math.min(this.image.width - sourceSize, this.hoverImagePoint.x - sourceSize / 2));
     var sy = Math.max(0, Math.min(this.image.height - sourceSize, this.hoverImagePoint.y - sourceSize / 2));
+    var zoomScaleX = zoomCanvas.width / sourceSize;
+    var zoomScaleY = zoomCanvas.height / sourceSize;
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(this.image, sx, sy, sourceSize, sourceSize, 0, 0, zoomCanvas.width, zoomCanvas.height);
+
+    for (var index = 0; index < this.points.length; index++) {
+        var point = this.points[index];
+        if (point.x < sx || point.y < sy || point.x > (sx + sourceSize) || point.y > (sy + sourceSize)) {
+            continue;
+        }
+
+        var zoomX = (point.x - sx) * zoomScaleX;
+        var zoomY = (point.y - sy) * zoomScaleY;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle = this.markerColor;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.arc(zoomX, zoomY, 10, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
 
     ctx.save();
     ctx.strokeStyle = '#2563eb';
@@ -341,10 +755,76 @@ wpd.MinimalApp.prototype.submit = function() {
     };
 
     this.lastSubmittedPayload = payload;
+    this.persistSubmission(payload);
     this.root.dispatchEvent(new CustomEvent('wpd:submit', {
         bubbles: true,
         detail: payload
     }));
+};
+
+wpd.MinimalApp.prototype.persistSubmission = function(payload) {
+    var submitUrl = this.root.dataset.wpdSubmitUrl;
+
+    if (typeof submitUrl !== 'string' || submitUrl.trim() === '' || typeof window.fetch !== 'function') {
+        return;
+    }
+
+    var app = this;
+    var requestHeaders = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+    var csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+
+    if (csrfTokenMeta != null) {
+        requestHeaders['X-CSRF-Token'] = csrfTokenMeta.content;
+    }
+
+    window.fetch(submitUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: requestHeaders,
+        body: JSON.stringify(payload)
+    }).then(function(response) {
+        return response.json().then(function(body) {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: body
+            };
+        }).catch(function() {
+            return {
+                ok: response.ok,
+                status: response.status,
+                body: null
+            };
+        });
+    }).then(function(result) {
+        if (result.ok) {
+            app.lastStoredSubmission = result.body;
+            app.root.dispatchEvent(new CustomEvent('wpd:submit:stored', {
+                bubbles: true,
+                detail: result.body
+            }));
+            return;
+        }
+
+        app.root.dispatchEvent(new CustomEvent('wpd:submit:storage-error', {
+            bubbles: true,
+            detail: {
+                status: result.status,
+                errors: result.body != null && Array.isArray(result.body.errors) ? result.body.errors : ['Failed to persist submission']
+            }
+        }));
+    }).catch(function(error) {
+        app.root.dispatchEvent(new CustomEvent('wpd:submit:storage-error', {
+            bubbles: true,
+            detail: {
+                status: 0,
+                errors: [error.message]
+            }
+        }));
+    });
 };
 
 wpd.mountMinimalApp = function(rootElement) {

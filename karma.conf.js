@@ -73,9 +73,7 @@ module.exports = function(config) {
 
 
         // list of files / patterns to exclude
-        exclude: [
-            "javascript/main.js", // main wpd entry point
-        ],
+        exclude: [],
 
 
         // preprocess matching files before serving them to the browser

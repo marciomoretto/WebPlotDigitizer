@@ -1,0 +1,21 @@
+<section class="minimal-controls">
+    {% if wpd_show_control_point_color | default(true) %}
+    {% include "_minimal_point_color_picker.html" %}
+    {% endif %}
+
+    {% if wpd_show_control_zoom | default(true) %}
+    {% include "_minimal_toolbar_zoom.html" %}
+    {% endif %}
+
+    {% if wpd_show_control_mode | default(true) %}
+    {% include "_minimal_toolbar_mode.html" %}
+    {% endif %}
+
+    {% if wpd_show_control_submit | default(true) %}
+    {% include "_minimal_toolbar_submit.html" %}
+    {% endif %}
+
+    {% if wpd_show_points_count | default(true) %}
+    {% include "_minimal_points_count.html" %}
+    {% endif %}
+</section>

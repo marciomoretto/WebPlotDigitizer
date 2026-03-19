@@ -1,0 +1,42 @@
+<%
+  show_header = local_assigns.fetch(:show_header, false)
+  show_toolbar = local_assigns.fetch(:show_toolbar, false)
+  show_controls = local_assigns.fetch(:show_controls, true)
+  show_zoom_panel = local_assigns.fetch(:show_zoom_panel, true)
+
+  show_point_color = local_assigns.fetch(:show_point_color, true)
+  show_zoom_controls = local_assigns.fetch(:show_zoom_controls, true)
+  show_mode_control = local_assigns.fetch(:show_mode_control, true)
+  show_submit_control = local_assigns.fetch(:show_submit_control, true)
+  show_points_count = local_assigns.fetch(:show_points_count, true)
+
+  default_image_path = local_assigns.fetch(:default_image_path, asset_path('images/teste.jpg'))
+  default_points_path = local_assigns[:default_points_path]
+  submit_url = if local_assigns.key?(:submit_url)
+                 local_assigns[:submit_url]
+               elsif respond_to?(:point_submissions_path)
+                 point_submissions_path(format: :json)
+               else
+                 '/digitizer/point_submissions.json'
+               end
+%>
+
+<main class="minimal-app" data-wpd-app data-wpd-default-image="<%= default_image_path %>" data-wpd-submit-url="<%= submit_url %>"<% if default_points_path.present? %> data-wpd-default-points="<%= default_points_path %>"<% end %>>
+  <div class="wpd-loading-curtain" data-wpd-loading-curtain>
+    Loading application, please wait...
+  </div>
+
+  <% if show_header %>
+    <%= render "web_plot_digitizer/pages/header" %>
+  <% end %>
+
+  <% if show_toolbar %>
+    <%= render "web_plot_digitizer/pages/toolbar", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
+  <% end %>
+
+  <% if show_controls %>
+    <%= render "web_plot_digitizer/pages/controls", show_point_color: show_point_color, show_zoom_controls: show_zoom_controls, show_mode_control: show_mode_control, show_submit_control: show_submit_control, show_points_count: show_points_count %>
+  <% end %>
+
+  <%= render "web_plot_digitizer/pages/workspace", show_zoom_panel: show_zoom_panel %>
+</main>

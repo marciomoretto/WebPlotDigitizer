@@ -1,9 +1,26 @@
-<main class="minimal-app" data-wpd-app data-wpd-default-image="start.png">
+{% set wpd_show_header = wpd_show_header | default(false) %}
+{% set wpd_show_toolbar = wpd_show_toolbar | default(false) %}
+{% set wpd_show_controls = wpd_show_controls | default(true) %}
+{% set wpd_show_zoom = wpd_show_zoom | default(true) %}
+{% set wpd_submit_url = wpd_submit_url | default('') %}
+{% set wpd_default_points_path = wpd_default_points_path | default('') %}
+
+<main class="minimal-app" data-wpd-app data-wpd-default-image="{{ wpd_default_image_path | default('images/teste.jpg') }}"{% if wpd_submit_url %} data-wpd-submit-url="{{ wpd_submit_url }}"{% endif %}{% if wpd_default_points_path %} data-wpd-default-points="{{ wpd_default_points_path }}"{% endif %}>
     <div class="wpd-loading-curtain" data-wpd-loading-curtain>
         {{ _('Loading application, please wait...') }}
     </div>
 
+    {% if wpd_show_header %}
     {% include "_minimal_header.html" %}
+    {% endif %}
+
+    {% if wpd_show_toolbar %}
     {% include "_minimal_toolbar.html" %}
+    {% endif %}
+
+    {% if wpd_show_controls %}
+    {% include "_minimal_controls.html" %}
+    {% endif %}
+
     {% include "_minimal_workspace.html" %}
 </main>

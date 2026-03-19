@@ -22,22 +22,12 @@
 {% set wpdVersion = '5.3' %}
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="Description" content="WebPlotDigitizer v{{ wpdVersion }} - {{ _('Web based tool to extract numerical data from plots and graph images.') }}" />
-    <meta name="Keywords" content="Plot, Digitizer, WebPlotDigitizer, Ankit Rohatgi, Extract Data, Convert Plots, XY, Polar, Ternary, Map, HTML5" />
-    <meta name="Author" content="Ankit Rohatgi" />
-    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-    <title>WebPlotDigitizer - Copyright 2010-2025 Ankit Rohatgi</title>
-    <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="styles/styles.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="styles/widgets.css" type="text/css" media="screen" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    {% include "_minimal_head_static.html" %}
     {% block scripts %}{% endblock %}
 </head>
 
-<body>
+<body class="wpd-minimal-page">
+    {% set wpd_default_image_path = 'images/teste.jpg' %}
     {% include "_minimal_app.html" %}
 </body>
 

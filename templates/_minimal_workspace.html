@@ -1,13 +1,18 @@
 <section class="workspace-card">
     <div class="canvas-panel" tabindex="0" data-wpd-hotkeys-scope aria-label="Digitizer canvas area">
         <canvas class="wpd-image-canvas" aria-label="Digitized image" data-wpd-image-canvas></canvas>
+        {% if wpd_show_zoom | default(true) %}
         <div class="zoom-panel">
             <div class="zoom-header">
                 <span>{{ _('Zoom') }}</span>
-                <span data-wpd-zoom-level>100%</span>
+                <div class="zoom-header-meta">
+                    <span data-wpd-zoom-level>100%</span>
+                    <button type="button" class="zoom-toggle-button" data-wpd-zoom-toggle data-label-expand="{{ _('Maximize zoom') }}" data-label-collapse="{{ _('Minimize zoom') }}" aria-expanded="true" aria-label="{{ _('Minimize zoom') }}" title="{{ _('Minimize zoom') }}"></button>
+                </div>
             </div>
             <canvas class="wpd-zoom-canvas" width="220" height="220" aria-label="Zoom preview" data-wpd-zoom-canvas></canvas>
             <p class="wpd-cursor-readout" data-wpd-cursor-readout>x: -, y: -</p>
         </div>
+        {% endif %}
     </div>
 </section>
